@@ -1,10 +1,11 @@
 import express from "express";
-// import "dotenv/config";
+import initApp from "./src/index.router.js";
+import "dotenv/config";
 
 const app = express();
-const PORT = 3000;
+const PORT = process.env.PORT;
 
-// initApp(app, express);
+initApp(app, express);
 
 app.listen(PORT, () => {
   console.log(`listening on port ${PORT}`);
