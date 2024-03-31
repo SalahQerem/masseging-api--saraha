@@ -1,4 +1,4 @@
-const dataMethod = ["body", "params", "query"];
+const dataMethod = ["body", "query", "params"];
 const validation = (schema) => {
   return (req, res, next) => {
     const validationArray = [];

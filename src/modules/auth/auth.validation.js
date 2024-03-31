@@ -13,7 +13,7 @@ export const SignupSchema = {
     password: joi.string().min(8).max(20).required().messages({
       "string.empty": "password is required",
     }),
-    checkPassword: joi.valid(joi.ref("password")).required(),
+    confirmPassword: joi.valid(joi.ref("password")).required(),
   }),
   query: joi.object({
     test: joi.boolean().required(),

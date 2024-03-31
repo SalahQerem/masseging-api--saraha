@@ -1,6 +1,7 @@
 import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
 import userModel from "../../../DB/models/user.model.js";
+import { sendEmail } from "../../utils/sendEmail.js";
 
 export const signup = async (req, res) => {
   const { userName, email, password } = req.body;
@@ -15,22 +16,20 @@ export const signup = async (req, res) => {
     parseInt(process.env.SALT_ROUND)
   );
 
-  const token = await jwt.sign({ email }, process.env.CONFIRMEMAILTOKEN, {
+  const token = await jwt.sign({ email }, process.env.CONFIRMEMAILSIG, {
     expiresIn: "1h",
   });
 
-  const refreshToken = await jwt.sign(
-    { email },
-    process.env.CONFIRMEMAILTOKEN,
-    { expiresIn: 60 * 60 * 24 * 30 }
-  );
+  const refreshToken = await jwt.sign({ email }, process.env.CONFIRMEMAILSIG, {
+    expiresIn: 60 * 60 * 24 * 30,
+  });
 
   const html = `
-<p>welcom  ${userName}</p>
-<div>
-<a href='${req.protocol}://${req.headers.host}/auth/confirmEmail/${token}'>confirm email</a>
- <a href='${req.protocol}://${req.headers.host}/auth/confirmEmail/${refreshToken}'>resend confirm email</a>;
- </div>
+          <p>welcome  ${userName}</p>
+          <div>
+          <a href='${req.protocol}://${req.headers.host}/auth/confirmEmail/${token}'>confirm email</a>
+          <a href='${req.protocol}://${req.headers.host}/auth/confirmEmail/${refreshToken}'>resend confirm email</a>;
+          </div>
  
  `;
   await sendEmail(email, "confirm Email", html);
@@ -44,7 +43,20 @@ export const signup = async (req, res) => {
     return res.json({ message: "error while creating user" });
   }
 
-  return res.status(201).json({ message: "success", newUser });
+  return res.status(201).json({ newUser });
+};
+
+export const confirmEmail = async (req, res) => {
+  const { token } = req.params;
+  const decoded = jwt.verify(token, process.env.CONFIRMEMAILSIG);
+  const user = await userModel.updateOne(
+    { email: decoded.email },
+    { confirmEmail: true }
+  );
+  if (user.modifiedCount > 0) {
+    return res.redirect(process.env.FRONTENDURL);
+  }
+  return res.json({ message: "success", user });
 };
 
 export const login = async (req, res) => {
@@ -69,5 +81,5 @@ export const login = async (req, res) => {
     expiresIn: "1h",
   });
 
-  return res.status(200).json({ message: "success", token });
+  return res.status(200).json({ token: `${process.env.BERERTOKEN + token}` });
 };
