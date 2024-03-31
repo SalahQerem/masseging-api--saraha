@@ -1,4 +1,4 @@
-import messageModel from "../../../DB/models/Message.model.js";
+import messageModel from "../../../DB/models/message.model.js";
 import userModel from "../../../DB/models/user.model.js";
 
 export const getMessage = async (req, res) => {
