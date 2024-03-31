@@ -1,5 +1,5 @@
 import messageModel from "../../../DB/models/Message.model.js";
-import userModel from "../../../DB/models/User.model.js";
+// import userModel from "../../../DB/models/user.model.js";
 
 export const getMessage = async (req, res) => {
   const messageList = await messageModel.find({ recieverId: req.user._id });
